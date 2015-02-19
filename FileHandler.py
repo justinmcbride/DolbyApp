@@ -3,6 +3,9 @@ import json
 
 FILE_SUBDIR = "./files/"
 
+def fullFile(filename):
+	return FILE_SUBDIR + filename
+
 def GetAllFiles():
 	files = []
 	for f in os.listdir(FILE_SUBDIR):
@@ -18,6 +21,9 @@ def DoesFileExist(filename):
 	return False
 
 def GetFile(filename):
-	with open(FILE_SUBDIR + filename, "r") as f:
+	with open(fullFile(filename), "r") as f:
 		contents = f.read()
 	return json.loads(contents)
+
+def DeleteFile(filename):
+	os.remove(fullFile(filename))

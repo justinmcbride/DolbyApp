@@ -22,12 +22,16 @@ def singleFile(fileName):
         if fh.DoesFileExist(fileName):
             return formatResponse(fh.GetFile(fileName))
         else:
-            return formatResponse("File not found.", error=True)
+            return formatResponse("File not found", error=True)
     elif request.method == 'PUT':
         if not json:
             return notJSON()
     elif request.method == 'DELETE':
-        return formatResponse("Deleted")
+        if fh.DoesFileExist(fileName):
+            fh.DeleteFile(fileName)
+            return formatResponse({"deleted": True})
+        else:
+            return formatResponse("File not found", error=True)
 
 '''
 This route will be used to create a new file on the server.
@@ -55,4 +59,4 @@ if __name__ == '__main__':
     server.debug = True
     server.run()
 
-# TODO: allow cli of host and port address
+# TODO: allow cli of host and port address, don't crash on empty json file while reading
