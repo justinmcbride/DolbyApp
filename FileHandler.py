@@ -27,3 +27,7 @@ def GetFile(filename):
 
 def DeleteFile(filename):
 	os.remove(fullFile(filename))
+
+def CreateFile(filename, contents):
+	with open(fullFile(filename), "w") as f:
+		f.write(json.dumps(contents))

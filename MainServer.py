@@ -12,35 +12,35 @@ def MainPage():
     return formatResponse({"allFiles":fh.GetAllFiles()})
 
 '''
-This route will be used to retrieve, modify, or delete a file on the server.
+This route will be used to retrieve, create, modify, or delete a file on the server.
 '''
-@server.route('/file/<string:fileName>', methods=['GET', 'PUT', 'DELETE'])
-def singleFile(fileName):
+@server.route('/file/<string:filename>', methods=['GET', 'PUT', 'DELETE', 'POST'])
+def singleFile(filename):
     json = request.json
 
     if request.method == 'GET':
-        if fh.DoesFileExist(fileName):
-            return formatResponse(fh.GetFile(fileName))
+        if fh.DoesFileExist(filename):
+            return formatResponse(fh.GetFile(filename))
         else:
             return formatResponse("File not found", error=True)
     elif request.method == 'PUT':
         if not json:
             return notJSON()
     elif request.method == 'DELETE':
-        if fh.DoesFileExist(fileName):
-            fh.DeleteFile(fileName)
+        if fh.DoesFileExist(filename):
+            fh.DeleteFile(filename)
             return formatResponse({"deleted": True})
         else:
             return formatResponse("File not found", error=True)
+    elif request.method == 'POST':
+        if not json:
+            return notJSON()
+        if fh.DoesFileExist(filename):
+            return formatResponse("File already exists; not created", error=True)
+        fh.CreateFile(filename, json)
+        return formatResponse({"created" : True, "filename": filename})
+    ## No need for an else, as Flask won't send other requests here
 
-'''
-This route will be used to create a new file on the server.
-'''
-@server.route('/file', methods=['POST'])
-def createFile():
-    json = request.json
-    if not json:
-        return notJSON()
 
 '''
 To create an always parseable response,
