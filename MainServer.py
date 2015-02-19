@@ -9,7 +9,7 @@ Return a list of all files on the server, along with their ID.
 '''
 @server.route('/')
 def MainPage():
-    return formatResponse("MainPage")
+    return formatResponse(fh.GetAllFiles())
 
 '''
 This route will be used to retrieve, modify, or delete a file on the server.
