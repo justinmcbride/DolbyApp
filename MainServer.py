@@ -47,6 +47,21 @@ def singleFile(filename):
 
 
 '''
+This route should handle multiple files.
+Retrieving, creating, modifying, and deleting.
+'''
+@server.route('/files', methods=['GET', 'PUT', 'DELETE', 'POST'])
+def MutipleFiles():
+    json = request.json
+    if not json:
+        return notJSON()
+    if request.method == 'GET':
+        # Get multiple files
+    elif request.method == 'PUT':
+    elif request.method == 'DELETE':
+    elif request.method == 'POST':
+
+'''
 To create an always parseable response,
 run all responses through this function
 '''
