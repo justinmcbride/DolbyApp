@@ -29,11 +29,11 @@ def singleFile(filename):
         if fh.DoesFileExist(filename):
             return formatResponse(fh.ModifyFile(filename, json))
         else:
-            return formatResponse("File not found", error=True)
+            return formatResponse("File not found; first POST the file", error=True)
     elif request.method == 'DELETE':
         if fh.DoesFileExist(filename):
             fh.DeleteFile(filename)
-            return formatResponse({"deleted": True})
+            return formatResponse({ "deleted": True })
         else:
             return formatResponse("File not found", error=True)
     elif request.method == 'POST':
@@ -42,7 +42,7 @@ def singleFile(filename):
         if fh.DoesFileExist(filename):
             return formatResponse("File already exists; not created", error=True)
         fh.CreateFile(filename, json)
-        return formatResponse({"created" : True, "filename": filename})
+        return formatResponse({ "created" : True, "filename" : filename })
     ## No need for an else, as Flask won't send other requests here
 
 
@@ -53,13 +53,38 @@ Retrieving, creating, modifying, and deleting.
 @server.route('/files', methods=['GET', 'PUT', 'DELETE', 'POST'])
 def MutipleFiles():
     json = request.json
+    resp = {}
+
     if not json:
         return notJSON()
+
     if request.method == 'GET':
-        # Get multiple files
+        for filename in json:
+            if fh.DoesFileExist(filename):
+                resp[filename] = fh.GetFile(filename)
+            else:
+                resp[filename] = "File does not exist"
     elif request.method == 'PUT':
+        for filename in json:
+            if fh.DoesFileExist(filename):
+                resp[filename] = { "modified" : True, "information" : fh.ModifyFile(filename, json[filename]) }
+            else:
+                resp[filename] = { "modified" : False, "reason" : "File does not exist; first POST it"}
     elif request.method == 'DELETE':
+       for filename in json:
+            if fh.DoesFileExist(filename):
+                fh.Delete(filename)
+                resp[filename] = { "deleted" : True }
+            else:
+                resp[filename] = { "deleted" : False, "reason" : "File does not exist" }
     elif request.method == 'POST':
+        for filename in json:
+            if not fh.DoesFileExist(filename):
+                fh.CreateFile(filename, json[filename])
+                resp[filename] = { "created" : True }
+            else:
+                resp[filename] = { "created" : False, "reason" : "File already exists" }
+    return formatResponse(resp)
 
 '''
 To create an always parseable response,
@@ -79,3 +104,5 @@ if __name__ == '__main__':
     server.run()
 
 # TODO: allow cli of host and port address, don't crash on empty json file while reading
+# problems: get multiple files without pushing json data, assuming proper permissions
+# ideas: expand to specify the operation on each file

@@ -57,7 +57,7 @@ def ModifyFile(filename, newContents):
 				# Skip the item completely, as it is null
 				continue
 			contents[newitem] = newContents[newitem]
-			changes['additions'].append({newitem, newContents[newitem]})
+			changes['additions'].append({newitem : newContents[newitem]})
 	with open(fullFile(filename), "w+") as f:
 		json.dump(contents, f)
 	return {"old_contents" : old, "new_contents" : contents, "changes" : changes}
