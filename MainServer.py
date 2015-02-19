@@ -9,24 +9,25 @@ Return a list of all files on the server, along with their ID.
 '''
 @server.route('/')
 def MainPage():
-    return formatResponse(fh.GetAllFiles())
+    return formatResponse({"allFiles":fh.GetAllFiles()})
 
 '''
 This route will be used to retrieve, modify, or delete a file on the server.
 '''
-@server.route('/file/<int:fileID>', methods=['GET', 'PUT', 'DELETE'])
-def singleFile(fileID):
+@server.route('/file/<string:fileName>', methods=['GET', 'PUT', 'DELETE'])
+def singleFile(fileName):
     json = request.json
 
     if request.method == 'GET':
-        return formatResponse({"passedInt": fileID})
+        if fh.DoesFileExist(fileName):
+            return formatResponse(fh.GetFile(fileName))
+        else:
+            return formatResponse("File not found.", error=True)
     elif request.method == 'PUT':
         if not json:
             return notJSON()
     elif request.method == 'DELETE':
         return formatResponse("Deleted")
-
-    return formatResponse({"passedInt": fileID})
 
 '''
 This route will be used to create a new file on the server.

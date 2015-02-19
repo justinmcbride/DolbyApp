@@ -1,0 +1,5 @@
+{
+	"attr1" : 10,
+	"attr2" : "information",
+	"attr3" : ["item1", "item2", "item3"]
+}
