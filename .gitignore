@@ -1,1 +1,2 @@
-FileHandler.pyc
+__pycache__
+*.pyc
