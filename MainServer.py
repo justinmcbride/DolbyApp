@@ -5,7 +5,7 @@ server = Flask(__name__)
 
 '''
 The main page of the API.
-Return a list of all files on the server, along with their ID.
+Return a list of all files on the server.
 '''
 @server.route('/')
 def MainPage():
@@ -26,6 +26,10 @@ def singleFile(filename):
     elif request.method == 'PUT':
         if not json:
             return notJSON()
+        if fh.DoesFileExist(filename):
+            return formatResponse(fh.ModifyFile(filename, json))
+        else:
+            return formatResponse("File not found", error=True)
     elif request.method == 'DELETE':
         if fh.DoesFileExist(filename):
             fh.DeleteFile(filename)
