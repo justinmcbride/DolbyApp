@@ -34,14 +34,14 @@ def create_app(testing=False):
     '''
     @app.route('/file/<string:filename>', methods=['GET', 'PUT', 'DELETE', 'POST'])
     def singleFile(filename):
-        json = request.json
-
+        
         if request.method == 'GET':
             if fh.DoesFileExist(filename):
                 return formatResponse(fh.GetFile(filename))
             else:
                 return formatResponse("File not found", error=True)
         elif request.method == 'PUT':
+            json = request.json
             if not json:
                 return notJSON()
             if fh.DoesFileExist(filename):
@@ -55,6 +55,7 @@ def create_app(testing=False):
             else:
                 return formatResponse("File does not exist", error=True)
         elif request.method == 'POST':
+            json = request.json
             if not json:
                 return notJSON()
             if not filename.endswith(".json"):
