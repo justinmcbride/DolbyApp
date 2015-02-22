@@ -120,7 +120,3 @@ if __name__ == '__main__':
     app.debug = True
     app.run()
     
-
-# TODO: allow cli of host and port address, don't crash on empty json file while reading
-# problems: get multiple files without pushing json data, assuming proper permissions, ignoring nulls
-# ideas: expand to specify the operation on each file
