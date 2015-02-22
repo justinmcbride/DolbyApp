@@ -14,8 +14,10 @@ Respond with the fact that JSON was expected
 def notJSON():
     return formatResponse("Expected JSON data. Ensure Content-Type header is sent.", error=True)
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
+    if testing:
+        fh.setFileDir('./testingDir/')
     '''
     The main page of the API.
     Return a list of all files on the server.
@@ -105,7 +107,6 @@ if __name__ == '__main__':
     app.debug = True
     app.run()
     
-
 
 # TODO: allow cli of host and port address, don't crash on empty json file while reading
 # problems: get multiple files without pushing json data, assuming proper permissions, ignoring nulls

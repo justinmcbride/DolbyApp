@@ -4,6 +4,9 @@ from copy import deepcopy #used to save contents of original file after modifica
 
 FILE_SUBDIR = "./files/"
 
+def setFileDir(path):
+	FILE_SUBDIR = path
+
 def fullFile(filename):
 	return FILE_SUBDIR + filename
 

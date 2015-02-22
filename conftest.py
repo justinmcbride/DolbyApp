@@ -3,4 +3,6 @@ from MainServer import create_app
 
 @pytest.fixture
 def app():
-	return create_app()
+    app = create_app(testing=True)
+    app.config['TESTING'] = True
+    return app
