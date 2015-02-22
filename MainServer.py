@@ -16,6 +16,9 @@ def notJSON():
 
 def create_app(testing=False):
     app = Flask(__name__)
+    from utility import ListConverter
+    app.url_map.converters['list'] = ListConverter
+
     if testing:
         fh.setFileDir('./testingDir/')
     '''
@@ -50,10 +53,12 @@ def create_app(testing=False):
                 fh.DeleteFile(filename)
                 return formatResponse({ "deleted": True })
             else:
-                return formatResponse("File not found", error=True)
+                return formatResponse("File does not exist", error=True)
         elif request.method == 'POST':
             if not json:
                 return notJSON()
+            if not filename.endswith(".json"):
+                return formatResponse("Filename needs to be a .json file", error=True)
             if fh.DoesFileExist(filename):
                 return formatResponse("File already exists; not created", error=True)
             fh.CreateFile(filename, json)
@@ -63,35 +68,23 @@ def create_app(testing=False):
 
     '''
     This route should handle multiple files.
-    Retrieving, creating, modifying, and deleting.
+    Creating and modifying.
     '''
-    @app.route('/files', methods=['GET', 'PUT', 'DELETE', 'POST'])
-    def MutipleFiles():
+    @app.route('/files', methods=['PUT', 'POST'])
+    def MultiPostPut():
         json = request.json
         resp = {}
 
         if not json:
             return notJSON()
 
-        if request.method == 'GET':
-            for filename in json:
-                if fh.DoesFileExist(filename):
-                    resp[filename] = fh.GetFile(filename)
-                else:
-                    resp[filename] = "File does not exist"
-        elif request.method == 'PUT':
+        if request.method == 'PUT':
             for filename in json:
                 if fh.DoesFileExist(filename):
                     resp[filename] = { "modified" : True, "information" : fh.ModifyFile(filename, json[filename]) }
                 else:
-                    resp[filename] = { "modified" : False, "reason" : "File does not exist; first POST it"}
-        elif request.method == 'DELETE':
-           for filename in json:
-                if fh.DoesFileExist(filename):
-                    fh.Delete(filename)
-                    resp[filename] = { "deleted" : True }
-                else:
-                    resp[filename] = { "deleted" : False, "reason" : "File does not exist" }
+                    resp[filename] = { "modified" : False, "information" : "File does not exist; first POST it"}
+        
         elif request.method == 'POST':
             for filename in json:
                 if not fh.DoesFileExist(filename):
@@ -100,6 +93,25 @@ def create_app(testing=False):
                 else:
                     resp[filename] = { "created" : False, "reason" : "File already exists" }
         return formatResponse(resp)
+    
+    @app.route('/files/<list:files>', methods=['GET', 'DELETE'])
+    def MultiGetDelete(files):
+        resp = {}
+        if request.method == 'GET':
+            for filename in files:
+                if fh.DoesFileExist(filename):
+                    resp[filename] = fh.GetFile(filename)
+                else:
+                    resp[filename] = "File does not exist"
+        elif request.method == 'DELETE':
+           for filename in files:
+                if fh.DoesFileExist(filename):
+                    fh.DeleteFile(filename)
+                    resp[filename] = { "deleted" : True }
+                else:
+                    resp[filename] = { "deleted" : False, "reason" : "File does not exist" }
+        return formatResponse(resp)
+
     return app
 
 if __name__ == '__main__':
